@@ -12,3 +12,4 @@ WORKDIR /app
 COPY --from=builder /app/whatsapp-bridge .
 EXPOSE 8080
 CMD ["./whatsapp-bridge"]
+# force rebuild
