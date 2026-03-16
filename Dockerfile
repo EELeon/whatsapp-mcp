@@ -1,13 +1,13 @@
-FROM golang:1.21-alpine AS builder
-RUN apk add --no-cache gcc musl-dev sqlite-dev
+FROM golang:1.21-bullseye AS builder
+RUN apt-get update && apt-get install -y gcc libsqlite3-dev
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=1 go build -o whatsapp-bridge .
+RUN CGO_ENABLED=1 GOOS=linux go build -o whatsapp-bridge .
 
-FROM alpine:latest
-RUN apk add --no-cache sqlite-libs ca-certificates
+FROM debian:bullseye-slim
+RUN apt-get update && apt-get install -y libsqlite3-0 ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=builder /app/whatsapp-bridge .
 EXPOSE 8080
